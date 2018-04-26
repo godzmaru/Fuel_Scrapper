@@ -1,0 +1,79 @@
+{% extends "fuel/header.html" %}
+
+{% block content %}
+<div class= "jumbotron">
+    <div class= "container-fluid">
+        <h1>WA Fuel Scrapper</h1>
+    </div> 
+</div>
+
+<div class= "container-fluid">
+    <div class="row">
+        <div class= "col-md-2"> <h4>Postcode/Suburb:</h4></div>
+        <div class="form-group col-md-4">
+            <input type ="text" class="form-control" placeholder="Enter Postcode or Suburb here" required />
+        </div>
+        <div class= "col-md-offset-1 col-md-2"> <h4>Show Prices For:</h4></div>
+        <div class= "col-md-2 dropdown">
+            <button class="btn btn-primary dropdown-toggle" id="day" type="button" data-toggle="dropdown">Select Day
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <input class="form-control" id="day" type="text" placeholder="Search..">
+                <li><a href="#">Today</a></li>
+                <li><a href="#">Tomorrow</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-2 checkbox">
+            <label><input type="checkbox" value=""><strong>Surrounding Areas</strong></label>
+        </div>
+    </div>
+    <div class="row">
+        <div class= "col-md-12"> <h2>Available Products:</h2></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h4 class= "text-center">Petrol</h4>
+                </div>
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action">ULP</button>
+                    <button type="button" class="list-group-item list-group-item-action">PULP</button>
+                    <button type="button" class="list-group-item list-group-item-action">98 RON</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h4 class= "text-center">Diesel</h4>
+                </div>
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action">Diesel</button>
+                    <button type="button" class="list-group-item list-group-item-action">Brand Diesel</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class= "text-center">Others</h4>
+                </div>
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action">E85</button>
+                    <button type="button" class="list-group-item list-group-item-action">LPG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+<footer>
+    <div class= "container-fluid">
+        <p>Fuel Scrapper&copy; Hendra Wahyu {% now 'Y' %}</p>
+    </div>
+</footer>
+{% endblock %}

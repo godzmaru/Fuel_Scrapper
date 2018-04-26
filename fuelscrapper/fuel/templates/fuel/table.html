@@ -1,0 +1,50 @@
+{% extends "fuel/header.html" %}
+
+{% block content %}
+<div class= "container-fluid table-responsive" id="fuel_table">
+    <table class= "table table-hover table-condensed" border=0>
+        <thead>
+        {% if fuel %}
+        <tr class="success">
+            {% for key in fuel.0 %}
+                <th> {{ key | capfirst }} </th>
+            {% endfor %}
+        </tr>
+        {% endif %}    
+        </thead>
+        <tbody>
+        {% if fuel %}
+            {% for element in fuel %} 
+                <tr data-id="{{loop.index}}" data-latitude= "{{element.latitude}}" data-longitude="{{element.longitude}}">
+                    {% for value in element.values %}
+                        <td>{{ value }}</td>            
+                    {% endfor %}
+                </tr>    
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+<div class= "container-fluid">
+    <button class="btn btn-danger btn-block">Save</button>
+</div>
+<br><hr>
+<div id="map" style="width:100%;height:400px;"></div>
+<script>
+    function initMap(){
+        var map_prop = {center:new google.maps.LatLng(-31.957528, 115.794194), zoom:5,};
+        var map = new google.maps.Map(document.getElementById("map"), map_prop);
+    }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeD1kpe17xHpwEdJwVLSzNl98299ildkI&callback=initMap">
+</script>
+
+<hr>
+<footer>
+    <div class= "container-fluid">
+        <p>Fuel Scrapper&copy; Hendra Wahyu {% now 'Y' %}</p>
+    </div>
+</footer>
+
+{% endblock %}
