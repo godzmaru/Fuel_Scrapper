@@ -1,16 +1,17 @@
-from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from .forms import Contact
 
 # scrape function
 from lxml import objectify
 import urllib3
 import pandas as pd
+import json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 http = urllib3.PoolManager()
-container = []
 param = {'Product', 'Suburb', 'Region', 'Brand', 'Surrounding', 'Day'}
+views = ['fuel/mithril.html', 'fuel/jquery.html', 'fuel/table.html']
 
 def index(request):
     return render(request, 'fuel/index.html')
@@ -23,30 +24,36 @@ def contact(request):
     else:
         form = Contact()
     return render(request, 'fuel/contact.html', {'form': form})
-    
+
+def mithril_index(request):
+    fuel = get_fuel(Product = '1', Suburb = 'Mandurah', Day = 'today')
+    fuel = json.dumps(sorted(fuel, key=sort_prices))
+    return render(request, 'fuel/mithril.html', {'fuel':fuel,})
+
+def jquery_index(request):
+    fuel = get_fuel(Product = '1', Suburb = 'Perth', Day = 'today')
+    fuel = json.dumps(sorted(fuel, key=sort_prices))
+    return render(request, 'fuel/jquery.html', {'fuel':fuel,})  
+
 def fuel_table(request):
-    fuel = remove_elem(get_fuel(Product = '1', Suburb = 'Murdoch', Day = 'today'))
+    product = request.GET.get('Product', 1)
+    #suburb = request.GET.get()
+    day = request.GET.get('Day','today')
+    fuel = get_fuel(Product = product, Suburb = 'Perth', Day = day)
     fuel = sorted(fuel, key=sort_prices) 
     return render(request, 'fuel/table.html', {'fuel':fuel,})
 
 def get_fuel(**param):
+    container = []
     for key, value in param.items():
         response = http.request('GET','https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS', fields = param)
         root = objectify.fromstring(response.data)
 
     for each in root.channel.item:
-        fuel_data = {}
         data = (each.getchildren())
-        for d in data:    
-            fuel_data[d.tag] = d.text
+        fuel_data = {d.tag: d.text for d in data if d.tag != 'description' and d.tag != 'site-features' and d.tag != 'title' and d.tag != 'trading-name'}
         container.append(fuel_data)
     return container
-
-def remove_elem(container):
-    # convert to Panda to eliminate 
-    temp = pd.DataFrame(container, columns=['address', 'brand', 'date', 'latitude', 'longitude', 'location', 'phone', 'price'])
-    data = list(temp.T.to_dict().values())
-    return data
 
 def sort_prices(elem):
     return elem['price']

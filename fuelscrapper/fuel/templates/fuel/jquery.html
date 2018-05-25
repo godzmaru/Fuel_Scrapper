@@ -1,0 +1,78 @@
+{% extends "fuel/header.html" %}
+
+{% block content %}
+<script>
+$(document).ready(function(){
+    $(".dropdown").on("hide.bs.dropdown", function(){
+        $(".btn").html('Please Select <span class="caret"></span>');
+    });
+    
+    $("#filter-list li").on({
+        mouseenter: function(){
+            $(this).css("background-color", "gray")
+        },
+        mouseleave: function(){
+            $(this).css("background-color", "white")
+        },
+        click: function(event){
+            alert($(this).text());
+        }
+    });
+    $(".dropdown").on("show.bs.dropdown", function(){
+        $(".btn").html('Please Select <span class="caret caret-up"></span>');
+    });
+    
+    $("#filter").on("keyup", function(){
+        var value = $(this).val().toLowerCase();
+        $("#table tr").filter(function(){
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    
+    $.makeTable = function (fuel_data) {
+        var table = $("<table border=1>");
+        <!-- table header -->
+        var tblHeader = "<tr>";
+        for (var k in fuel_data[0]) tblHeader += "<th>" + k + "</th>";
+        tblHeader += "</tr>";
+        $(tblHeader).appendTo(table);
+        
+        table += "</table>";
+        return ($(table));
+    };
+    var fuel ={{fuel | safe}};
+    var fuel_data ={fuelPrices: [],};
+    
+    var table = $.makeTable(fuel_data);
+    $(table).appendTo("#fuelTable"));
+    
+});
+</script>
+
+<div class= "jumbotron">
+    <div class= "container-fluid">
+        <h1>WA Fuel Scrapper by jQuery</h1>
+        <h3><label class= "label label-default" for="filter">Filter By Word: </label></h3>
+        <input id= "filter" class= "form-control" type= "text" placeholder="Search for ... "/>
+        <br>
+        <div class= "row">
+            <div class = "col-md-4">
+                <h3><label class= "label label-default" for="col-filter">Filter By Column: </label></h3>
+                <div class= "dropdown">
+                    <button id= "button-list" class="btn btn-primary dropdown-toggle" type= "button" data-toggle= "dropdown">Please Select <span class= "caret"></span></button>
+                    <ul id= "filter-list" class="dropdown-menu">
+                        <li><strong>Date</strong></li>
+                        <li><strong>Brand</strong></li>
+                        <li><strong>Location</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class = "col-md-4">
+                
+            </div>
+        </div>
+    </div> 
+</div>
+<div id= "fuelTable" class= "container-fluid"></div>
+
+{% endblock %}

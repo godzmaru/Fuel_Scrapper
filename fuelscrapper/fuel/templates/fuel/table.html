@@ -1,8 +1,9 @@
 {% extends "fuel/header.html" %}
 
 {% block content %}
-<div class= "container-fluid table-responsive" id="fuel_table">
-    <table class= "table table-hover table-condensed" border=0>
+<br>
+<div class= "container-fluid table-responsive">
+    <table id = "fuel-table" class= "table table-hover table-condensed" border=0>
         <thead>
         {% if fuel %}
         <tr class="success">
@@ -13,15 +14,13 @@
         {% endif %}    
         </thead>
         <tbody>
-        {% if fuel %}
             {% for element in fuel %} 
-                <tr data-id="{{loop.index}}" data-latitude= "{{element.latitude}}" data-longitude="{{element.longitude}}">
+                <tr data-latitude= "{{element.latitude}}" data-longitude="{{element.longitude}}">
                     {% for value in element.values %}
-                        <td>{{ value }}</td>            
+                        <td>{{ value | safe }}</td>            
                     {% endfor %}
                 </tr>    
             {% endfor %}
-        {% endif %}
         </tbody>
     </table>
 </div>
@@ -30,6 +29,8 @@
 </div>
 <br><hr>
 <div id="map" style="width:100%;height:400px;"></div>
+
+<!-- All Scripts here -->
 <script>
     function initMap(){
         var map_prop = {center:new google.maps.LatLng(-31.957528, 115.794194), zoom:5,};
@@ -39,6 +40,7 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeD1kpe17xHpwEdJwVLSzNl98299ildkI&callback=initMap">
 </script>
+
 
 <hr>
 <footer>

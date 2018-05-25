@@ -1,0 +1,73 @@
+{% extends "fuel/header.html" %}
+
+{% block content %}
+<script src="//unpkg.com/mithril/mithril.js"></script>
+<script> 
+    var root = document.body
+    var state ={ fuelPrices:[],};
+    var fuel_data = {{fuel | safe}};
+    
+    var fuelApp = {
+        view: function() {
+            var header = Object.keys(fuel_data[0]).map(function(k){
+                console.log(k);
+                return m("th[style='text-align:center']", k.toUpperCase());
+            });
+            var newArray = state.fuelPrices.map(function(each){
+                return m('tr',        
+                    m('td',each['brand']),
+                    m('td',each['date']),
+                    m('td',each['price']),
+                    m('td',each['location']),
+                    m('td',each['address']),
+                    m('td',each['phone']),
+                    m('td',each['latitude']),
+                    m('td',each['longitude']),
+                );
+            });
+            return m("main", 
+                m(".header", 
+                    m("nav.navbar.navbar-inverse.navbar-fixed-top", 
+                        m("div.container-fluid",
+                            m("div.navbar-header",
+                                m("a.navbar-brand[href='/']", "FuelWatch"),
+                                m("ul.nav.navbar-nav",
+                                    m("li",m("a[href='/']", "Home")),
+                                    m("li",m("a[href='/contact/']", "Contact")),
+                                    m("li",m("a[href='/jquery']", "jQuery")),  
+  
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                m(".body",
+                    m("div.container-fluid",
+                        m("h1", 
+                            m("div.jumbotron", "WA Fuel Scrapper using Mithril.js "),
+                            m('button.btn.btn-default.btn-primary', { onclick: function(){
+                                    state.fuelPrices = fuel_data;
+                                },
+                            }, 'unleaded'),
+                            ' ',
+                            m('button.btn.btn-default.btn-danger', { onclick: function(){
+                                    state.fuelPrices = fuel_data; 
+                                },
+                            }, 'premium'),
+                        ),
+                    ),
+                    m("div.container-fluid",
+                        m('table.table.table-striped', 
+                            m('tr', header),
+                            newArray,)
+                    ),
+                ),
+            );
+        },
+    }
+    
+    m.mount(root, fuelApp)
+    
+</script>
+
+{% endblock %}
