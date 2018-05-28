@@ -32,13 +32,88 @@
 
 <!-- All Scripts here -->
 <script>
-    function initMap(){
-        var map_prop = {center:new google.maps.LatLng(-31.957528, 115.794194), zoom:5,};
-        var map = new google.maps.Map(document.getElementById("map"), map_prop);
+    var table = $("table tbody");
+    var map;
+    
+    function attainLocation(){
+        var tableLocs = [];
+        table.find('tr').each( function(i){
+            var $t_data = $(this).find("td"),
+                        brandName = $t_data.eq(0).text(),
+                        Lat = $t_data.eq(6).text();
+                        Long = $t_data.eq(7).text();
+            var location = {
+                        "brandName": brandName,
+                        "latitude": Lat,
+                        "longitude": Long,
+            };
+            tableLocs.push(location);
+        });
+        return tableLocs;
     }
+    
+    function initMap(){
+        var map_prop = {
+                    center:new google.maps.LatLng(-31.957528, 115.794194), 
+                    zoom:11,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+        map = new google.maps.Map(document.getElementById("map"), map_prop);
+        var locations = attainLocation();
+        setMarkers(map, locations);
+        navigator.geolocation.getCurrentPosition(current_pos);
+    }
+    
+    function current_pos(position){
+        var userLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        var marker = new google.maps.Marker({
+                position: userLatLng,
+                title: "Current Position",
+                map: map,
+                icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+        });
+        var content = "My Location"
+        var infoWindow = new google.maps.InfoWindow();
+        
+        google.maps.event.addListener(marker, "click", (function(marker, content,infoWindow){
+                 return function(){
+                     infoWindow.setContent(content);
+                     infoWindow.open(map, marker);
+                 };   
+        })(marker, content, infoWindow));
+    }
+    
+    function setMarkers(map, locations){
+        var marker, i;
+        for(i = 0; i < locations.length; i++){
+            var brand = locations[i].brandName;
+            var lat = locations[i].latitude;
+            var long = locations[i].longitude;
+            latlngset = new google.maps.LatLng(lat, long);
+            
+            var marker = new google.maps.Marker({
+                        map: map,
+                        title: brand,
+                        position: latlngset
+            });
+            map.setCenter(marker.getPosition());
+            
+            var content = "Site: " + brand + "</h3>"
+            var infoWindow = new google.maps.InfoWindow();
+            
+            google.maps.event.addListener(marker, "click", (function(marker, content,infoWindow){
+                 return function(){
+                     infoWindow.setContent(content);
+                     infoWindow.open(map, marker);
+                 };   
+            })(marker, content, infoWindow));
+        }
+        
+    }
+
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeD1kpe17xHpwEdJwVLSzNl98299ildkI&callback=initMap">
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeD1kpe17xHpwEdJwVLSzNl98299ildkI&callback=initMap">
 </script>
 
 
