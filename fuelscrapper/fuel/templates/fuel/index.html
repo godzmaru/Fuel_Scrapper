@@ -11,9 +11,17 @@
 <div class= "container-fluid">
     <form action= "{% url 'table' %}" method="GET">
     <div class="row">
-        <div class= "col-md-2"> <h4>Postcode/Suburb:</h4></div>
+        <div class= "col-md-2"> <h4>Suburb:</h4></div>
         <div class="form-group col-md-4">
-            <input type ="text" class="form-control" placeholder="Enter Postcode or Suburb here" />
+            <!--<input type ="text" class="form-control" placeholder="Enter Postcode or Suburb here" />-->
+            <select class="form-control" name="Suburb" width= "500px">
+                {% if suburb %}
+                    <option selected="selected">Any Suburb</option>
+                    {% for v in suburb %}
+                        <option value= {{ v }}> {{ v }} </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
         </div>
         <div class= "col-md-offset-1 col-md-2"> <h4>Show Prices For:</h4></div>
         <div class= "col-md-2 dropdown">

@@ -25,6 +25,7 @@ $(document).ready(function(){
                 "United",
                 "Vibe",
                 "Wesco"];
+    
     <!--Create unordered List -->
     var bList = $('ul.brand-list');
     $.each(brand, function(i){
@@ -48,8 +49,7 @@ $(document).ready(function(){
         },
         click: function(event){
             var value = $(this).text();
-            $('table tr td:contains('+value+')').css('background', 'red');
-            $('table tr td:contains('+value+')').closest('tr').css('background', 'blue');
+            $('table tr td:contains('+value+')').closest('tr').hide();
         }
     });
     
@@ -101,14 +101,38 @@ $(document).ready(function(){
 <label class= "label label-default" for="filter">Filter By Word: </label>
 <input id= "filter-input" class= "form-control" type= "text" placeholder="Search for ... "/>
 <div class= "row">
+    <div class = "col-md-2">
+        <br>
+        <div class= "dropdown">
+            <label class= "label label-default" for="col-filter">Filter By Brand: </label>
+            <button id= "button-list" class="btn btn-primary dropdown-toggle" type= "button" data-toggle= "dropdown">Select Brand <span class= "caret"></span></button>
+            <ul id= "filter-list" class="brand-list dropdown-menu"></ul>
+        </div>
+    </div>
     <div class = "col-md-4">
-           
-           <br>
-           <div class= "dropdown">
-               <label class= "label label-default" for="col-filter">Filter By Brand: </label>
-               <button id= "button-list" class="btn btn-primary dropdown-toggle" type= "button" data-toggle= "dropdown">Select Brand <span class= "caret"></span></button>
-               <ul id= "filter-list" class="brand-list dropdown-menu"></ul>
-            </div>
+        <br>
+        <div class= "suburb">
+            <label class= "label label-default" for="col-filter">Filter By Suburb: </label>
+            <select id= "suburb-list" class="form-control">Select Suburb</button>
+                {% if suburb %}
+                    <option selected="selected">Any Suburb</option>
+                    {% for v in suburb %}
+                        <option value= {{ v }}> {{ v }} </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+    </div>
+    <div class = "col-md-2">
+        <br>
+        <div class= "date">
+            <label class= "label label-default" for="col-filter">Filter By Date: </label>
+            <select id= "date-list" class="form-control">Select Date</button>
+                <option selected="selected" value= "today">Today</option>
+                <option value= "tomorrow">Tomorrow</option>
+                <option value= "yesterday">Yesterday</option>
+            </select>
+        </div>
     </div>
 </div>
 <hr>

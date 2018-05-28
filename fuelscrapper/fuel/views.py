@@ -1,12 +1,12 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.shortcuts import render
+from django.http import HttpResponse, Http404
 from .forms import Contact
 
 # scrape function
 from lxml import objectify
 import urllib3
-import pandas as pd
 import json
+from . import params
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 http = urllib3.PoolManager()
@@ -14,7 +14,8 @@ param = {'Product', 'Suburb', 'Region', 'Brand', 'Surrounding', 'Day'}
 views = ['fuel/mithril.html', 'fuel/jquery.html', 'fuel/table.html']
 
 def index(request):
-    return render(request, 'fuel/index.html')
+    suburb = params.get_suburb()
+    return render(request, 'fuel/index.html', {'suburb':suburb})
 
 def contact(request):
     if request.method == 'POST':
@@ -31,17 +32,18 @@ def mithril_index(request):
     return render(request, 'fuel/mithril.html', {'fuel':fuel,})
 
 def jquery_index(request):
+    suburb = params.get_suburb()
     fuel = get_fuel(Product = '1', Suburb = 'Perth', Day = 'today')
     fuel = json.dumps(sorted(fuel, key=sort_prices))
-    return render(request, 'fuel/jquery.html', {'fuel':fuel,})  
+    return render(request, 'fuel/jquery.html', {'fuel':fuel, 'suburb':suburb})  
 
 def fuel_table(request):
     product = request.GET.get('Product', 1)
-    #suburb = request.GET.get()
+    suburb = request.GET['Suburb']
     day = request.GET.get('Day','today')
-    fuel = get_fuel(Product = product, Suburb = 'Perth', Day = day)
+    fuel = get_fuel(Product = product, Suburb = suburb, Day = day)
     fuel = sorted(fuel, key=sort_prices) 
-    return render(request, 'fuel/table.html', {'fuel':fuel,})
+    return render(request, 'fuel/table.html', {'fuel':fuel })
 
 def get_fuel(**param):
     container = []
