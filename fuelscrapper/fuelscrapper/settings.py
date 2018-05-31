@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import dj_database_url
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'cj=u38**mqeo60^e#q9*&9oy--v+&tzy(j#bcve%-kz=16dfoi'
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','cj=u38**mqeo60^e#q9*&9oy--v+&tzy(j#bcve%-kz=16dfoi' )
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
-DEBUG = bool( os.environ.get('DJANGO_DEBUG', True))
+DEBUG = config('DEBUG', default = False, cast = bool)
                             
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
@@ -78,10 +79,7 @@ WSGI_APPLICATION = 'fuelscrapper.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
 
 
