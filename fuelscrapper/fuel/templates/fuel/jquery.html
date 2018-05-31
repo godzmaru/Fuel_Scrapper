@@ -36,6 +36,7 @@ $(document).ready(function(){
             .appendTo(bList);
     });
     
+    <!-- add behavior to brand button -->
     $(".dropdown").on("hide.bs.dropdown", function(){
         $(".btn").html('Select Brand <span class="caret"></span>');
     });
@@ -48,8 +49,9 @@ $(document).ready(function(){
             $(this).css("background-color", "white")
         },
         click: function(event){
-            var value = $(this).text();
-            $('table tr td:contains('+value+')').closest('tr').hide();
+            var val = $(this).attr("value");
+            $('table tbody tr').hide()
+            $('table tbody tr td:contains('+val+')').closest('tr').show();
         }
     });
     
@@ -59,15 +61,17 @@ $(document).ready(function(){
     
     <!--Populate and create Table -->
     $.makeTable = function (data) {
-        var table = $('<table class="table table-striped">');
+        var table = $('<table class="table table-striped" id="fuel_table">');
         <!-- table header -->
-        var tblHeader = "<tr>";
+        var tblHeader = "<thead><tr>";
         for (var k in data[0]) tblHeader += "<th style='text-align:center'>" + k.toUpperCase() + "</th>";
-        tblHeader += "</tr>";
+        tblHeader += "</tr></thead>";
         $(tblHeader).appendTo(table);
         
+        var tblBody = "<tbody>";
+        $(tblBody).appendTo(table);
         <!-- table row -->
-        $.each(data, function (index, value) {
+        $.each(data, function (index, value) { 
             var TableRow = "<tr>";
             $.each(value, function (key, val) {
                 TableRow += "<td>" + val + "</td>";
@@ -89,6 +93,13 @@ $(document).ready(function(){
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
     }); 
+    
+     <!-- Add behavior to Suburb List selector to filter table -->
+    $("#suburb-selector").change(function(){
+        var selection = $(this).val();
+        $('table tbody tr').hide();
+        $('table tbody tr td:contains('+selection+')').closest('tr').show(); 
+    });
 });
 </script>
 
@@ -98,34 +109,23 @@ $(document).ready(function(){
     </div> 
 </div>
 
-<label class= "label label-default" for="filter">Filter By Word: </label>
-<input id= "filter-input" class= "form-control" type= "text" placeholder="Search for ... "/>
+<form method= "GET">
 <div class= "row">
-    <div class = "col-md-2">
-        <br>
-        <div class= "dropdown">
-            <label class= "label label-default" for="col-filter">Filter By Brand: </label>
-            <button id= "button-list" class="btn btn-primary dropdown-toggle" type= "button" data-toggle= "dropdown">Select Brand <span class= "caret"></span></button>
-            <ul id= "filter-list" class="brand-list dropdown-menu"></ul>
-        </div>
+    <h2> 1. Choose your Product </h2>
+    <div class = "col-md-4">
+        <label class= "label label-default">Product Selection: </label>
+        <select class="form-control" name="Product">
+            <option selected value="1">ULP</option>
+            <option value="2">PULP</option>
+            <option value="6">RON98</option>
+            <option value="4">Diesel</option>
+            <option value="11">Brand Diesel</option>
+            <option value="5">LPG</option>
+            <option value="10">E85</option>
+        </select>
     </div>
     <div class = "col-md-4">
-        <br>
-        <div class= "suburb">
-            <label class= "label label-default" for="col-filter">Filter By Suburb: </label>
-            <select id= "suburb-list" class="form-control">Select Suburb</button>
-                {% if suburb %}
-                    <option selected="selected">Any Suburb</option>
-                    {% for v in suburb %}
-                        <option value= {{ v }}> {{ v }} </option>
-                    {% endfor %}
-                {% endif %}
-            </select>
-        </div>
-    </div>
-    <div class = "col-md-2">
-        <br>
-        <div class= "date">
+        <div class= "date" name="Day">
             <label class= "label label-default" for="col-filter">Filter By Date: </label>
             <select id= "date-list" class="form-control">Select Date</button>
                 <option selected="selected" value= "today">Today</option>
@@ -135,7 +135,41 @@ $(document).ready(function(){
         </div>
     </div>
 </div>
+<div>
+    <br>
+    <input class="btn btn-primary" type="submit" value="Submit">
+</div>
+</form>
 <hr>
+<h2> 2. Filter your Product </h2>
+<label class= "label label-default" for="filter">By Word: </label>
+<input id= "filter-input" class= "form-control" type= "text" placeholder="Search for ... "/>
+<div class= "row">
+    <div class = "col-md-2">
+        <br>
+        <div class= "dropdown">
+            <label class= "label label-default" for="col-filter">By Brand: </label>
+            <button id= "button-list" class="btn btn-primary dropdown-toggle" type= "button" data-toggle= "dropdown">Select Brand <span class= "caret"></span></button>
+            <ul id= "filter-list" class="brand-list dropdown-menu"></ul>
+        </div>
+    </div>
+    <div class = "col-md-4">
+        <br>
+        <div class= "suburb">
+            <label class= "label label-default" for="col-filter">By Suburb: </label>
+            <select id= "suburb-selector" class="form-control">Select Suburb</button>
+                {% if suburb %}
+                    <option selected="selected" value= "">Any Suburb</option>
+                    {% for v in suburb %}
+                        <option value= "{{ v | safe }}"> {{ v | safe }} </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+    </div>
+</div>
+<hr>
+<h2> 3. Result </h2>
 <div id= "fuelTable" class= "container-fluid"></div>
 
 {% endblock %}

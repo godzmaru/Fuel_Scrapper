@@ -27,13 +27,19 @@ def contact(request):
     return render(request, 'fuel/contact.html', {'form': form})
 
 def mithril_index(request):
-    fuel = get_fuel(Product = '1', Suburb = 'Mandurah', Day = 'today')
+    product = request.GET.get('Product',1)
+    suburb = params.get_suburb()
+    brand = params.get_brand()
+    fuel = get_fuel(Product = product, Day = 'today')
     fuel = json.dumps(sorted(fuel, key=sort_prices))
-    return render(request, 'fuel/mithril.html', {'fuel':fuel,})
+    return render(request, 'fuel/mithril.html', {'fuel':fuel, 'suburb': suburb, 'brand': brand})
+    
 
 def jquery_index(request):
+    product = request.GET.get('Product',1)
+    day = request.GET.get('Day', 'today')
     suburb = params.get_suburb()
-    fuel = get_fuel(Product = '1', Suburb = 'Perth', Day = 'today')
+    fuel = get_fuel(Product = product, Day = day)
     fuel = json.dumps(sorted(fuel, key=sort_prices))
     return render(request, 'fuel/jquery.html', {'fuel':fuel, 'suburb':suburb})  
 

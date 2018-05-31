@@ -4,15 +4,39 @@
 <script src="//unpkg.com/mithril/mithril.js"></script>
 <script> 
     var root = document.body
-    var state ={ fuelPrices:[],};
+    var state ={ fuelPrices:[] };
     var fuel_data = {{fuel | safe}};
+    var suburb_list = {{ suburb | safe }};
+    var brand_list = {{ brand | safe }};
+    var catch_err = '';
+    
+    function suburb_selector(){
+        var selection = this.value;
+        state.fuelPrices = fuel_data
+        state.fuelPrices = state.fuelPrices.filter(x => x.location == selection);
+    }
+    
+    function brand_selector(){
+        var selection = this.value;
+        state.fuelPrices = fuel_data
+        state.fuelPrices = state.fuelPrices.filter(x => x.brand == selection);
+    }
     
     var fuelApp = {
         view: function() {
             var header = Object.keys(fuel_data[0]).map(function(k){
-                console.log(k);
                 return m("th[style='text-align:center']", k.toUpperCase());
             });
+            
+            var extract = function(xhr, xhrOptions) {
+                                try {
+                                    return JSON.stringify(xhr.responseText)
+                                }
+                                catch (e) {
+                                    throw new Error("Server is offline")
+                                }
+                           };
+            
             var newArray = state.fuelPrices.map(function(each){
                 return m('tr',        
                     m('td',each['brand']),
@@ -25,6 +49,7 @@
                     m('td',each['longitude']),
                 );
             });
+            
             return m("main", 
                 m(".header", 
                     m("nav.navbar.navbar-inverse.navbar-fixed-top", 
@@ -45,17 +70,63 @@
                     m("div.container-fluid",
                         m("h1", 
                             m("div.jumbotron", "WA Fuel Scrapper using Mithril.js "),
-                            m('button.btn.btn-default.btn-primary', { onclick: function(){
-                                    state.fuelPrices = fuel_data;
-                                },
-                            }, 'unleaded'),
-                            ' ',
-                            m('button.btn.btn-default.btn-danger', { onclick: function(){
-                                    state.fuelPrices = fuel_data; 
-                                },
-                            }, 'premium'),
-                        ),
+                            m('hr'),
+                            m('h3', "1. Choose Product:"),
+                            m("div.row",
+                                m("div.col-sm-3",                            
+                                    m('select.form-control', 
+                                        m('option.selected[value = "today"]',"Today"),
+                                        m('option[value = "tomorrow"]',"Tomorrow"),
+                                        m('option[value = "yesterday"]',"Yesterday"),
+                                    )
+                                ),
+                                m("div.col-sm-2.text-center",
+                                    m('button.btn.btn-default.btn-primary', { onclick: function(){
+                                            state.fuelPrices = fuel_data; 
+                                        },
+                                    }, 'Unleaded'),
+                                ),
+                                m("div.col-sm-2.text-center",
+                                    m('button.btn.btn-default.btn-danger', { onclick: function(){
+                                            m.request({method:"GET", url:'/mithril/by/product/?Product=2'}).then(function(fuel_data){
+                                               state.fuelPrices = fuel_data; 
+                                            });
+                                        },
+                                    }, 'Premium 95'),
+                                ),
+                                m("div.col-sm-2.text-center",
+                                    m('button.btn.btn-default.btn-info', { onclick: function(){
+                                            m.request('/mithril/by/product/?Product=6').then(function(fuel_data){
+                                                state.fuelPrices = fuel_data; 
+                                            });
+                                        },
+                                    }, 'Premium 98'),
+                                ),  
+                            ),
+                            m("hr"),
+                            m('h3', "2. Filter your Product:"),
+                            m("div.row",
+                                m("div.col-sm-4",   
+                                    m('h4',
+                                        m("label.label.label-default", "filter by Brand"),                         
+                                    ),
+                                    m('select.form-control', {onchange: brand_selector},brand_list.map(function(u){
+                                        return m("option", {value: u}, u)
+                                    }))
+                                ),
+                                m("div.col-sm-4",   
+                                    m('h4',
+                                        m("label.label.label-default", "filter by Suburb"),                         
+                                    ),
+                                    m('select.form-control', {onchange: suburb_selector}, suburb_list.map(function(s){
+                                        return m("option", {value: s}, s);
+                                    }))
+                                ),
+                            ),
+                        ), 
                     ),
+                    m("hr"),
+                    m('h3', "3. Result:"),
                     m("div.container-fluid",
                         m('table.table.table-striped', 
                             m('tr', header),
