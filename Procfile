@@ -1,0 +1,1 @@
+web: gunicorn fuelwatch.wsgi --log-file -

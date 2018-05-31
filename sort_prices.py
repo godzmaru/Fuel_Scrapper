@@ -58,9 +58,22 @@ def get_fuel(**param):
         data = (each.getchildren())
         for d in data:    
             fuel_data[d.tag] = d.text
+            print(d.tag)
         container.append(fuel_data)
     return container
 
+def get_fuel1(**param):
+    for key, value in param.items():
+        response = http.request('GET','https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS', fields = param)
+        root = objectify.fromstring(response.data)
+
+    for each in root.channel.item:
+        data = (each.getchildren())
+        fuel_data = {d.tag: d.text for d in data if d.tag != 'description' and d.tag != 'site-features' and d.tag != 'title' and d.tag != 'trading-name'}
+        container.append(fuel_data)
+    return container
+
+# Unused
 def remove_elem(container):
     # convert to Panda to eliminate 
     temp = pd.DataFrame(container, columns=['address', 'brand', 'date', 'latitude', 'longitude', 'location', 'phone', 'price'])
@@ -69,11 +82,14 @@ def remove_elem(container):
     coord = list(enumerate(temp_c.T.to_dict().values()))
     return data, coord
     
-#def sort_prices(elem):
-#    return elem['price']
+def sort_prices(elem):
+    return elem['price']
+
+import json
 
 # different sorting
-fuel_info = get_fuel(Product = '1', Suburb = 'Murdoch', Day = 'today')
+fuel_info = get_fuel1(Product = '1', Suburb = 'Mandurah', Day = 'today')
+fuel_json = json.dumps(fuel_info)
 fuel_info2 = sorted(fuel_info, key=sort_prices)   
 fuel_info3 = sorted(fuel_info, key = lambda x: x['brand'], reverse = True)
 fuel_info4, coord = remove_elem(fuel_info)
