@@ -4,40 +4,36 @@
 <script src="//unpkg.com/mithril/mithril.js"></script>
 <script> 
     var root = document.body
-    var state ={ fuelPrices:[] };
-    var fuel_data = {{fuel | safe}};
+    var state ={ fuelPrices:[], fuelFilter: [] };
+    var fuel_data = [];
     var suburb_list = {{ suburb | safe }};
     var brand_list = {{ brand | safe }};
-    var catch_err = '';
+    var header = [];
     
     function suburb_selector(){
         var selection = this.value;
-        state.fuelPrices = fuel_data
-        state.fuelPrices = state.fuelPrices.filter(x => x.location == selection);
+        if(selection != ""){
+            state.fuelFilter = state.fuelPrices.filter(x => x.location == selection);
+        }
+        else {
+            state.fuelFilter = state.fuelPrices;
+        }
     }
     
     function brand_selector(){
         var selection = this.value;
-        state.fuelPrices = fuel_data
-        state.fuelPrices = state.fuelPrices.filter(x => x.brand == selection);
+        if(selection === "Any Brand"){
+            state.fuelFilter = state.fuelPrices;
+        }
+        else {
+            state.fuelFilter = state.fuelPrices.filter(x => x.brand == selection);
+        }
     }
     
     var fuelApp = {
         view: function() {
-            var header = Object.keys(fuel_data[0]).map(function(k){
-                return m("th[style='text-align:center']", k.toUpperCase());
-            });
             
-            var extract = function(xhr, xhrOptions) {
-                                try {
-                                    return JSON.stringify(xhr.responseText)
-                                }
-                                catch (e) {
-                                    throw new Error("Server is offline")
-                                }
-                           };
-            
-            var newArray = state.fuelPrices.map(function(each){
+            var newArray = state.fuelFilter.map(function(each){
                 return m('tr',        
                     m('td',each['brand']),
                     m('td',each['date']),
@@ -82,25 +78,38 @@
                                 ),
                                 m("div.col-sm-2.text-center",
                                     m('button.btn.btn-default.btn-primary', { onclick: function(){
-                                            state.fuelPrices = fuel_data; 
+                                            m.request({method:"GET", url:'/mithril/by/product/?Product=1'}).then(function(fuel_data){
+                                               state.fuelPrices = fuel_data;
+                                               header = Object.keys(state.fuelPrices[0]).map(function(k){
+                                                            return m("th[style='text-align:center']", k.toUpperCase());
+                                                        }); 
+                                            });
                                         },
-                                    }, 'Unleaded'),
+                                    }, 'Unleaded 91'),
                                 ),
                                 m("div.col-sm-2.text-center",
                                     m('button.btn.btn-default.btn-danger', { onclick: function(){
                                             m.request({method:"GET", url:'/mithril/by/product/?Product=2'}).then(function(fuel_data){
-                                               state.fuelPrices = fuel_data; 
+                                               state.fuelPrices = fuel_data;
+                                               state.fuelFilter = fuel_data;
+                                               header = Object.keys(state.fuelPrices[0]).map(function(k){
+                                                            return m("th[style='text-align:center']", k.toUpperCase());
+                                                        }); 
                                             });
                                         },
                                     }, 'Premium 95'),
                                 ),
                                 m("div.col-sm-2.text-center",
                                     m('button.btn.btn-default.btn-info', { onclick: function(){
-                                            m.request('/mithril/by/product/?Product=6').then(function(fuel_data){
+                                            m.request({method:"GET", url:'/mithril/by/product/?Product=6'}).then(function(fuel_data){
                                                 state.fuelPrices = fuel_data; 
+                                                state.fuelFilter = fuel_data;
+                                                header = Object.keys(state.fuelPrices[0]).map(function(k){
+                                                            return m("th[style='text-align:center']", k.toUpperCase());
+                                                        });
                                             });
                                         },
-                                    }, 'Premium 98'),
+                                    }, 'RON 98'),
                                 ),  
                             ),
                             m("hr"),
@@ -129,7 +138,7 @@
                     m('h3', "3. Result:"),
                     m("div.container-fluid",
                         m('table.table.table-striped', 
-                            m('tr', header),
+                            m("tr", header),
                             newArray,)
                     ),
                 ),
